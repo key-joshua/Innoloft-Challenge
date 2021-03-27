@@ -28,6 +28,11 @@ class ViewProducts extends Component {
       data: [],
       result: false,
       dataLoaded: false,
+
+      tab: true,
+      attrBtnClass: '',
+      desBtnClass: 'active-button',
+
     };
   }
 
@@ -38,6 +43,12 @@ class ViewProducts extends Component {
   }
 
   UNSAFE_componentWillReceiveProps(props) {
+    if (props.addEditloadedData === true) {
+      this.setState({ data: props.addEditData.data, dataLoaded: props.addEditloadedData });
+      toast.success(props.addEditData.message);
+      return;
+    }
+
     if (props.loadedData === true) {
       setTimeout(() => {
         this.setState({ result: false, data: props.data.data, dataLoaded: props.loadedData });
@@ -52,8 +63,21 @@ class ViewProducts extends Component {
     }
   }
 
+  handleTabButton(key, status) {
+    key.preventDefault();
+
+    if (status === 'desc') {
+      this.setState({ tab: true, desBtnClass: 'active-button', attrBtnClass: '' });
+      return;
+    }
+
+    if (status === 'attr') {
+      this.setState({ tab: false, desBtnClass: '', attrBtnClass: 'active-button' });
+    }
+  }
+
   render() {
-    const { result, data, dataLoaded } = this.state;
+    const { result, data, dataLoaded, tab, desBtnClass, attrBtnClass } = this.state;
 
     return (
 
@@ -67,9 +91,9 @@ class ViewProducts extends Component {
 
         <Navbar MainProps={this.props} />
 
-        <SideBar MainProps={{ props: this.props, data }} />
-
         {result === true ? <Loading MainProps={this.props} /> : null }
+
+        {dataLoaded === true && data ? <SideBar MainProps={{ props: this.props, data }} /> : null }
 
         <div className="product-container">
 
@@ -96,7 +120,7 @@ class ViewProducts extends Component {
                     <div className="product-info-container">
 
                       <div>Type: <span>{data.type.name}</span> </div>
-                      <div>Type: {data.categories.length > 0 ? data.categories.map((element) => <span key={element.id}>{element.name}, </span>) : null } </div>
+                      <div>categories: {data.categories.length > 0 ? data.categories.map((element) => <span key={element.id}>{element.name}, </span>) : null } </div>
 
                     </div>
 
@@ -104,9 +128,17 @@ class ViewProducts extends Component {
 
                     <div className="product-tab-container">
 
-                      <div className="description-container"> {shortData(data.description, 500)} </div>
+                      <div className="tab-button">
 
-                      <ViewAttribute MainProps={data} />
+                        <button type="button" className={desBtnClass} onClick={(key) => { this.handleTabButton(key, 'desc'); }}> Discription </button>
+                        <button type="button" className={attrBtnClass} onClick={(key) => { this.handleTabButton(key, 'attr'); }}> attributes </button>
+
+                      </div>
+
+                      { tab === true
+                        ? <div className="description-container"> {shortData(data.description, 800)} </div>
+
+                        : <ViewAttribute MainProps={{ data, props: this.props }} /> }
 
                     </div>
 
@@ -137,6 +169,10 @@ class ViewProducts extends Component {
 ViewProducts.defaultProps = {
   loadedData: null,
   data: {},
+
+  addEditloadedData: null,
+  addEditData: {},
+
   match: {},
   viewCurrentProduct: PropTypes.func,
 };
@@ -144,14 +180,21 @@ ViewProducts.defaultProps = {
 ViewProducts.propTypes = {
   loadedData: PropTypes.bool,
   data: PropTypes.shape(),
+
+  addEditloadedData: PropTypes.bool,
+  addEditData: PropTypes.shape(),
+
   match: PropTypes.shape(),
   viewCurrentProduct: PropTypes.func,
 };
 
-const mapStateToProps = ({ viewProductsInitialState, }) => (
+const mapStateToProps = ({ viewProductsInitialState, addEditProductsInitialState }) => (
   {
     loadedData: viewProductsInitialState.loading,
     data: viewProductsInitialState.data,
+
+    addEditloadedData: addEditProductsInitialState.loading,
+    addEditData: addEditProductsInitialState.data,
   }
 );
 

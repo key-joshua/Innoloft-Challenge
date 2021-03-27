@@ -7,7 +7,7 @@ import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
 
 class Loading extends Component {
   render() {
-    if (this.props.MainProps.match.path === '/'
+    if (this.props.MainProps.match.path === '/products/:productId'
     && this.props.Case === true) {
       return (
         <div>

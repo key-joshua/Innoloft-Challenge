@@ -2,7 +2,7 @@ import axios from 'axios';
 import { apiList } from '../../helpers';
 import { viewProductsTypes } from '../../actionTypes';
 
-export const viewProduct = (productId) => (dispatch) => axios.get(`${apiList.VEIW_PRODUCT_DETAILS}/${productId}`)
+export const viewProduct = (productId) => (dispatch) => axios.get(`${apiList.VEIW_PRODUCT_DETAILS_API}/${productId}`)
   .then((response) => {
     dispatch({
       type: viewProductsTypes.VIEW_PRODUCT_SUCCESS,
